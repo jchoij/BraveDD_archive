@@ -90,7 +90,7 @@ bool testOperation(uint16_t num, PredefForest bdd, BinaryOperationType opt, int 
             //
         }
     }
-    if (test <=19) return 1;
+
     std::string operation = "AND";
     if (opt == BinaryOperationType::BOP_UNION) {
         operation = "OR";
@@ -103,10 +103,9 @@ bool testOperation(uint16_t num, PredefForest bdd, BinaryOperationType opt, int 
     // build edges
     Edge e1, e2;
 
-
     e1 = buildSetEdge(forest, num, fun1, 0, size-1);
     e2 = buildSetEdge(forest, num, fun2, 0, size-1);
-    
+   
     // call apply, and check results
     f1.setEdge(e1);
     f2.setEdge(e2);
@@ -162,6 +161,7 @@ bool testOperation(uint16_t num, PredefForest bdd, BinaryOperationType opt, int 
             isPass = 0;
         }
         if (!isPass) {
+        // if (true) {
             counter++;
             std::cout << "Assignment: ";
             for (uint16_t k=1; k<=num; k++){
@@ -197,10 +197,11 @@ bool testOperation(uint16_t num, PredefForest bdd, BinaryOperationType opt, int 
         for (long long k=0; k<size; k++){
             std::cout << fun2[k] << ", ";
         }
+        std::cout << std::endl;
         // std::cout << std::endl;
         std::cout << "\tres should be: \t";
         for (long long k=0; k<size; k++){
-                std::cout << (fun1[k] || fun2[k]) << ", ";
+                std::cout << (fun1[k] && fun2[k]) << ", ";
         }
 
      
