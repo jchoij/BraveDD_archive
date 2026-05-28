@@ -1525,6 +1525,12 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
         packRule(root, rho);
 
         if (caches[0].check(cofactLvl, e1, e2, ans)) {
+            if (rho == RULE_00) {
+                return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 0));
+            }
+            if (rho == RULE_11) {
+                return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 1));
+            }
             return resForest->mergeEdge(lvl, cofactLvl, root, ans);
         };
         // ans = operateS(lvl, cofactLvl, e1, e2);
@@ -1534,7 +1540,6 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
             Edge q = resForest->cofact(cofactLvl, e2, i);
             child[i] = computeElmtWise(cofactLvl - 1, p, q);
         }
-       
         
         ans = resForest->reduceEdge(lvl, root, cofactLvl, child);
         
