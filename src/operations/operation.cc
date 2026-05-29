@@ -1217,6 +1217,22 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
     std::cout << "; e2: ";
     source2.print(std::cout);
     std::cout << std::endl;
+    if (source1.getNodeLevel() != 0) {
+        source1Forest->cofact(lvl, source1, 0).print(std::cout);
+        std::cout << std::endl;
+    }
+    if (source1.getNodeLevel() > lvl || source2.getNodeLevel() > lvl) {
+        std::cout << "ope" << std::endl;
+        exit(0);
+    }
+
+    if (source1.getNodeHandle() == 17 && source1.getNodeLevel() == 5) {
+        Func ok(source1Forest);
+        ok.setEdge(source1);
+        DotMaker dot(source1Forest, "ok");
+        dot.buildGraph(ok);
+        dot.runDot("pdf");
+    }
 #endif
     // the final answer
     Edge ans;
@@ -1523,6 +1539,14 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
 
         EdgeLabel root = 0;
         packRule(root, rho);
+        // if (cofactLvl > lvl) {
+        //     std::cout << "its here" << std::endl;
+        //     e1.print(std::cout);
+        //     std::cout << std::endl;
+        //     e2.print(std::cout);
+        //     std::cout << std::endl;
+        //     std::cout << "lvl: " << lvl << "; clvl: " << cofactLvl << std::endl; 
+        // }
 
         if (caches[0].check(cofactLvl, e1, e2, ans)) {
             if (rho == RULE_00) {
@@ -1531,6 +1555,15 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
             if (rho == RULE_11) {
                 return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 1));
             }
+            // if (ans.getRule() == RULE_00) {
+            //     std::cout << "this is it " << std::endl;
+            //     Edge comp = resForest->mergeEdge(lvl, cofactLvl, root, ans);
+            //     comp.print(std::cout);
+            //     std::cout << std::endl;
+            //     ans.print(std::cout);
+            //     std::cout << std::endl;
+            //     std::cout << std::endl;
+            // }
             return resForest->mergeEdge(lvl, cofactLvl, root, ans);
         };
         // ans = operateS(lvl, cofactLvl, e1, e2);
@@ -1540,12 +1573,35 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
             Edge q = resForest->cofact(cofactLvl, e2, i);
             child[i] = computeElmtWise(cofactLvl - 1, p, q);
         }
-        
-        ans = resForest->reduceEdge(lvl, root, cofactLvl, child);
-        
-        cacheAdd(0, cofactLvl, e1, e2, ans);
+        if (lvl < cofactLvl) {
+            // std::cout << "This is it lvl: " << lvl << "; cofactlvl: " << cofactLvl << std::endl;
+            // e1.print(std::cout);
+            // std::cout << "  ;  ";
+            // e2.print(std::cout);
+            // std::cout << std::endl;
+            // exit(0);
+        } 
+        ans = resForest->reduceEdge(cofactLvl, root, cofactLvl, child);
+        if (ans.getNodeLevel() == 5 && ans.getNodeHandle() == 2) {
+            std::cout << "This is it lvl: " << lvl << "; cofactlvl: " << cofactLvl << std::endl;
+            e1.print(std::cout);
+            std::cout << "  ;  ";
+            e2.print(std::cout);
+            std::cout << std::endl;
+            ans.print(std::cout);
+            std::cout << std::endl;
+            exit(0);
 
-        return resForest->normalizeEdge(lvl, ans);
+        } 
+        cacheAdd(0, cofactLvl, e1, e2, ans);
+        if (rho == RULE_00) {
+            return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 0));
+        }
+        if (rho == RULE_11) {
+            return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 1));
+        }
+        return resForest->mergeEdge(lvl, cofactLvl, root,  ans);
+        // return resForest->normalizeEdge(lvl, ans);
 #ifdef BRAVE_DD_OPERATION_TRACE
     std::cout << std::endl;
     std::cout << "rule1: " << rule2String(r1) << " rule2: " << rule2String(r2) << std::endl;

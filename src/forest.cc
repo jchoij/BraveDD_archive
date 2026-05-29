@@ -1202,6 +1202,10 @@ Edge Forest::mergeEdge(const Level beginLevel, const Level mergeLevel, const Edg
     if (incomingRule == RULE_X) {
         child[0] = reduced;
         child[1] = reduced;
+        std::cout << beginLevel << "; " << mergeLevel << std::endl;
+        if (beginLevel < mergeLevel + 1 ) {
+            std::cout << "this is it" << std::endl;
+        }
         normalized = normalizeNode(mergeLevel+1, child);
         normalized.setRule(RULE_X);
         return normalized;
@@ -1244,7 +1248,14 @@ Edge Forest::reduceEdge(const Level beginLevel, const EdgeLabel label, const Lev
 {
     /* check level */
     if (beginLevel < nodeLevel) {
+        
         std::cout << "[BRAVE_DD] ERROR!\t reduceEdge(): Invalid level for incoming edge or target node!" << std::endl;
+        std::cout << "down 0: ";
+        down[0].print(std::cout);
+        std::cout << "; down 1: ";
+        down[1].print(std::cout);
+        std::cout << std::endl;
+        std::cout << beginLevel << "; " << nodeLevel << std::endl;
         exit(0);
     }
     /* check number of child */
@@ -1252,6 +1263,7 @@ Edge Forest::reduceEdge(const Level beginLevel, const EdgeLabel label, const Lev
         std::cout << "[BRAVE_DD] ERROR!\t reduceEdge(): Incorrect number of child edges!" << std::endl;
         exit(0);
     }
+
     /* copy the children info */
     std::vector<Edge> child = down;
 #ifdef BRAVE_DD_FOREST_TRACE
