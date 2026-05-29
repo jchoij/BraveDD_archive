@@ -1574,25 +1574,14 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
             child[i] = computeElmtWise(cofactLvl - 1, p, q);
         }
         if (lvl < cofactLvl) {
-            // std::cout << "This is it lvl: " << lvl << "; cofactlvl: " << cofactLvl << std::endl;
-            // e1.print(std::cout);
-            // std::cout << "  ;  ";
-            // e2.print(std::cout);
-            // std::cout << std::endl;
-            // exit(0);
-        } 
-        ans = resForest->reduceEdge(cofactLvl, root, cofactLvl, child);
-        if (ans.getNodeLevel() == 5 && ans.getNodeHandle() == 2) {
             std::cout << "This is it lvl: " << lvl << "; cofactlvl: " << cofactLvl << std::endl;
             e1.print(std::cout);
             std::cout << "  ;  ";
             e2.print(std::cout);
             std::cout << std::endl;
-            ans.print(std::cout);
-            std::cout << std::endl;
             exit(0);
-
         } 
+        ans = resForest->reduceEdge(cofactLvl, root, cofactLvl, child);
         cacheAdd(0, cofactLvl, e1, e2, ans);
         if (rho == RULE_00) {
             return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 0));
