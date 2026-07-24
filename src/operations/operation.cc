@@ -1516,7 +1516,6 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
         Level cofactLvl;
         ReductionRule rho = RULE_X;
         if (!canISkip || m1 == lvl) {
-        // if (true) {
             cofactLvl = lvl;
         } else if (r1 == RULE_X) {
             rho = r2;
@@ -1533,21 +1532,13 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
                 cofactLvl = m1+1;
             }         
         } else {
-            std::cout << "I guess we have a missing case lol" << std::endl;
+            std::cout << "Missing Case" << std::endl;
             exit(0);
         }
 
         EdgeLabel root = 0;
         packRule(root, rho);
-        // if (cofactLvl > lvl) {
-        //     std::cout << "its here" << std::endl;
-        //     e1.print(std::cout);
-        //     std::cout << std::endl;
-        //     e2.print(std::cout);
-        //     std::cout << std::endl;
-        //     std::cout << "lvl: " << lvl << "; clvl: " << cofactLvl << std::endl; 
-        // }
-
+       
         if (caches[0].check(cofactLvl, e1, e2, ans)) {
             if (rho == RULE_00) {
                 return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 0));
@@ -1555,15 +1546,6 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
             if (rho == RULE_11) {
                 return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 1));
             }
-            // if (ans.getRule() == RULE_00) {
-            //     std::cout << "this is it " << std::endl;
-            //     Edge comp = resForest->mergeEdge(lvl, cofactLvl, root, ans);
-            //     comp.print(std::cout);
-            //     std::cout << std::endl;
-            //     ans.print(std::cout);
-            //     std::cout << std::endl;
-            //     std::cout << std::endl;
-            // }
             return resForest->mergeEdge(lvl, cofactLvl, root, ans);
         };
         // ans = operateS(lvl, cofactLvl, e1, e2);
