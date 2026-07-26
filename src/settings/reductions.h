@@ -17,6 +17,7 @@ namespace BRAVE_DD {
         IDENTITY_IDENTITY,  //  |
         FULLY_IDENTITY,     // -+
         ROAR, 
+        OR
     };
     static inline std::string reductionType2String(ReductionType rdt) {
         std::string redType;
@@ -40,6 +41,8 @@ namespace BRAVE_DD {
             redType = "Fully-Identity";
         } else if (rdt == ROAR) {
             redType = "Roar";
+        } else if (rdt == OR) {
+            redType = "Or";
         } else {
             redType = "Unknown";
         }
@@ -285,6 +288,9 @@ class BRAVE_DD::Reductions {
             } else if (type == ROAR) {
                 rules[RULE_X] = 1;
                 rules[RULE_00] = 1;
+                rules[RULE_11] = 1;
+            } else if (type == OR) {
+                rules[RULE_X] = 1;
                 rules[RULE_11] = 1;
             } else if (type == USER_DEFINED) {
                 // not change for user defined, it should be initialized later

@@ -1,4 +1,5 @@
 #include "setting.h"
+#include "settings/reductions.h"
 #include <regex>
 
 using namespace BRAVE_DD;
@@ -165,6 +166,10 @@ ForestSetting::ForestSetting(const PredefForest type, const unsigned numVals, co
         name = "ROAR";
         setCompType(COMP);
         setSwapType(ONE);
+    } else if (type == PredefForest::OR) {
+        reductions = Reductions(OR);
+        mergeType = PUSH_UP;
+        name = "OR";
     } else {
         // Unknown predefined BDD or BMxD
         std::cout << "[BRAVE_DD] ERROR!\t Unknown BDD/MxD!" << std::endl;

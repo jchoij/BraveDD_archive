@@ -244,6 +244,7 @@ int main(int argc, const char **argv) {
   if (strcmp(argv[2], "rex") == 0) ddType = PredefForest::REXBDD;
   if (strcmp(argv[2], "cesr") == 0) ddType = PredefForest::CESRBDD;
   if (strcmp(argv[2], "roar") == 0) ddType = PredefForest::ROAR;
+  if (strcmp(argv[2], "or") == 0) ddType = PredefForest::OR;
   ForestSetting setting1(ddType, levels);
   ForestSetting setting2(PredefForest::FBMXD, levels);
 
