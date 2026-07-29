@@ -1217,22 +1217,6 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
     std::cout << "; e2: ";
     source2.print(std::cout);
     std::cout << std::endl;
-    if (source1.getNodeLevel() != 0) {
-        source1Forest->cofact(lvl, source1, 0).print(std::cout);
-        std::cout << std::endl;
-    }
-    if (source1.getNodeLevel() > lvl || source2.getNodeLevel() > lvl) {
-        std::cout << "ope" << std::endl;
-        exit(0);
-    }
-
-    if (source1.getNodeHandle() == 17 && source1.getNodeLevel() == 5) {
-        Func ok(source1Forest);
-        ok.setEdge(source1);
-        DotMaker dot(source1Forest, "ok");
-        dot.buildGraph(ok);
-        dot.runDot("pdf");
-    }
 #endif
     // the final answer
     Edge ans;
@@ -1475,120 +1459,7 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
     // protect edges
     // ProtectEdge pe1(resForest, e1);
     // ProtectEdge pe2(resForest, e2);
-    if (resForest->getSetting().hasReductionRule(RULE_00)) {
-        // lvl > m1 >= m2
-        ReductionRule r1 = e1.getRule();
-        ReductionRule r2 = e2.getRule();
-        bool canISkip = false;
-
-        if (r1 == RULE_X || r2 == RULE_X) canISkip = true; 
-
-        if (r1 == RULE_00 && r1 == RULE_00) {
-            Edge targetChild1 = resForest->cofact(m1, e1, 0);
-            Edge targetChild2 = resForest->cofact(m1, e2, 0);
-            if (targetChild1.getRule() == RULE_X
-            && targetChild1.getNodeLevel() + 1 < m1) canISkip = true;
-            if (targetChild2.getRule() == RULE_X
-            && targetChild2.getNodeLevel() + 1 < m1) canISkip = true;
-        }
-        if (r1 == RULE_11 && r2 == RULE_11) {
-            Edge targetChild1 = resForest->cofact(m1, e1, 1);
-            Edge targetChild2 = resForest->cofact(m1, e2, 1);
-            if (targetChild1.getRule() == RULE_X
-            && targetChild1.getNodeLevel() + 1 < m1) canISkip = true;
-            if (targetChild2.getRule() == RULE_X
-            && targetChild2.getNodeLevel() + 1 < m1) canISkip = true;
-        }
-
-        if (!canISkip && r1 == r2) {
-            Edge tc1 = resForest->cofact(m1, e1, r1 == RULE_11);
-            Edge tc2 = resForest->cofact(m1, e2, r2 == RULE_11);
-            ReductionRule tr1 = tc1.getRule();
-            ReductionRule tr2 = tc2.getRule();
-            if (tr1 == RULE_X) canISkip = true;
-            if (tr2 == RULE_X) canISkip = true;
-        }
-
-        if (canISkip && r1 != r2) {
-            canISkip = false;
-        }
-
-        Level cofactLvl;
-        ReductionRule rho = RULE_X;
-        if (!canISkip || m1 == lvl) {
-            cofactLvl = lvl;
-        } else if (r1 == RULE_X) {
-            rho = r2;
-            if (r2 == RULE_X) {
-                cofactLvl = m1;
-            } else if (r2 == RULE_00 || r2 == RULE_11) {
-                cofactLvl = m1+1;
-            }           
-        } else if (r1 == RULE_00 || r1 == RULE_11) {
-            rho = r1;
-            if (r2 == RULE_X) {
-                cofactLvl = m1 > m2 ? m1 : m1 + 1;
-            } else if (r2 == RULE_00 || r2 == RULE_11) {
-                cofactLvl = m1+1;
-            }         
-        } else {
-            std::cout << "Missing Case" << std::endl;
-            exit(0);
-        }
-
-        EdgeLabel root = 0;
-        packRule(root, rho);
-       
-        if (caches[0].check(cofactLvl, e1, e2, ans)) {
-            if (rho == RULE_00) {
-                return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 0));
-            }
-            if (rho == RULE_11) {
-                return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 1));
-            }
-            return resForest->mergeEdge(lvl, cofactLvl, root, ans);
-        };
-        // ans = operateS(lvl, cofactLvl, e1, e2);
-        std::vector<Edge> child(2);
-        for (char i=0; i<2; i++) {
-            Edge p = resForest->cofact(cofactLvl, e1, i);
-            Edge q = resForest->cofact(cofactLvl, e2, i);
-            child[i] = computeElmtWise(cofactLvl - 1, p, q);
-        }
-        if (lvl < cofactLvl) {
-            std::cout << "This is it lvl: " << lvl << "; cofactlvl: " << cofactLvl << std::endl;
-            e1.print(std::cout);
-            std::cout << "  ;  ";
-            e2.print(std::cout);
-            std::cout << std::endl;
-            exit(0);
-        } 
-        ans = resForest->reduceEdge(cofactLvl, root, cofactLvl, child);
-        cacheAdd(0, cofactLvl, e1, e2, ans);
-        if (rho == RULE_00) {
-            return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 0));
-        }
-        if (rho == RULE_11) {
-            return resForest->mergeEdge(lvl, cofactLvl, root, ans, resForest->cofact(cofactLvl, ans, 1));
-        }
-        return resForest->mergeEdge(lvl, cofactLvl, root,  ans);
-        // return resForest->normalizeEdge(lvl, ans);
-#ifdef BRAVE_DD_OPERATION_TRACE
-    std::cout << std::endl;
-    std::cout << "rule1: " << rule2String(r1) << " rule2: " << rule2String(r2) << std::endl;
-    std::cout << "child 1: ";
-    child1[0].print(std::cout);
-    std::cout << " , ";
-    child1[1].print(std::cout);
-    std::cout << std::endl;
-    std::cout << "child 2: ";
-    child2[0].print(std::cout);
-    std::cout << " , ";
-    child2[1].print(std::cout);
-    std::cout << std::endl;
-#endif    
-    }
-
+    
     if (caches[0].check(lvl, e1, e2, ans) && !resForest->getSetting().isRelation()) {
         if (!ans.isConstantPosInf() && !ans.isConstantNegInf()) ans.setValue(originalVal + ans.getValue());
         return ans;
@@ -1855,6 +1726,7 @@ Edge BinaryOperation::computeElmtWise(const Level lvl, const Edge& source1, cons
         return ans;
     }
 }
+
 
 Edge BinaryOperation::computeUnion(const Level lvl, const Edge& source1, const Edge& source2)
 {
